@@ -91,3 +91,6 @@ sw.*
 
 /node_modules
 .env
+
+/tes
+.test
