@@ -2,7 +2,7 @@ import product from '../models/Product.js';
 import category from '../models/Category.js';
 import mongoose from 'mongoose';
 
-const index = async (req, res) => {
+const index = async (_, res) => {
     try {
         const products = await product.find({status: 'active'});
     
@@ -57,8 +57,7 @@ const store = async (req, res) => {
         }
 
         const productExist = await product.findOne({title: req.body.title});
-        if (productExist) {
-            throw {
+        if (productExist) {throw {
                 code: 428,
                 message: "Product is exist!",
             }
@@ -85,10 +84,10 @@ const store = async (req, res) => {
         const categoryId = req.body.categoryId;
 
         const newProduct = new product({
-            title: title,
-            thumbnail: thumbnail,
-            price: price,
-            categoryId: categoryId,
+            title,
+            thumbnail,
+            price,
+            categoryId,
         })
 
         const Product = await newProduct.save();
@@ -102,7 +101,7 @@ const store = async (req, res) => {
 
         return res.status(200).json({
             status: true,
-            Product,
+            product: Product,
         })
     } catch (err) {
         if (!err.code) {

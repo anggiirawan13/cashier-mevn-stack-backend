@@ -1,6 +1,6 @@
 import category from '../models/Category.js'
 
-const index = async (req, res) => {
+const index = async (_, res) => {
     try {
         const categories = await category.find({status: 'active'});
 
@@ -35,7 +35,7 @@ const store = async (req, res) => {
         const title = req.body.title;
 
         const newCategory = new category({
-            title: title,
+            title,
         })
 
         const Category = await newCategory.save();
@@ -49,7 +49,7 @@ const store = async (req, res) => {
 
         return res.status(200).json({
             status: true,
-            Category,
+            category: Category,
         })
     } catch (err) {
         return res.status(err.code).json({
