@@ -1,108 +1,107 @@
-import product from '../models/Product.js';
-import category from '../models/Category.js';
-import mongoose from 'mongoose';
+import product from "../models/Product.js";
+import category from "../models/Category.js";
+import mongoose from "mongoose";
 
 const index = async (_, res) => {
     try {
-        const products = await product.find({status: 'active'});
-    
+        const products = await product.find({ status: "active" });
+
         if (!products) {
             throw {
                 code: 500,
-                message: "Get products failed",
-            }
+                message: "GET_PRODUCTS_FAILED",
+            };
         }
 
         return res.status(200).json({
             status: true,
             total: products.length,
             products,
-        })
+        });
     } catch (err) {
         return res.status(err.code).json({
             status: false,
             message: err.message,
-        })
+        });
     }
-}
+};
 
 const store = async (req, res) => {
     try {
         if (!req.body.title) {
             throw {
                 code: 428,
-                message: "Title is required!",
-            }
+                message: "TITLE_IS_REQUIRED",
+            };
         }
-        
+
         if (!req.body.thumbnail) {
             throw {
                 code: 428,
-                message: "Thumbnail is required!",
-            }
+                message: "THUMBNAIL_IS_REQUIRED",
+            };
         }
 
         if (!req.body.price) {
             throw {
                 code: 428,
-                message: "Price is required!",
-            }
+                message: "PRICE_IS_REQUIRED",
+            };
         }
 
         if (!req.body.categoryId) {
             throw {
                 code: 428,
-                message: "Category ID is required!",
-            }
+                message: "CATEGORYID_IS_REQUIRED",
+            };
         }
 
-        const productExist = await product.findOne({title: req.body.title});
-        if (productExist) {throw {
+        const productExist = await product.findOne({ title: req.body.title });
+        if (productExist) {
+            throw {
                 code: 428,
-                message: "Product is exist!",
-            }
+                message: "PRODUCT_IS_EXIST",
+            };
         }
 
         if (!mongoose.Types.ObjectId.isValid(req.body.categoryId)) {
             throw {
                 code: 500,
-                message: "CategoryId invalid!",
-            }
+                message: "CATEGORYID_INVALID",
+            };
         }
 
-        const categoryExist = await category.findOne({_id: req.body.categoryId});
+        const categoryExist = await category.findOne({
+            _id: req.body.categoryId,
+        });
         if (!categoryExist) {
             throw {
                 code: 428,
-                message: "Category is not exist!",
-            }
+                message: "CATEGORYID_NOT_EXIST",
+            };
         }
 
-        const title = req.body.title;
-        const thumbnail = req.body.thumbnail;
-        const price = req.body.price;
-        const categoryId = req.body.categoryId;
-
         const newProduct = new product({
-            title,
-            thumbnail,
-            price,
-            categoryId,
-        })
+            title: req.body.title,
+            thumbnail: req.body.thumbnail,
+            price: req.body.price,
+            categoryId: req.body.categoryId,
+        });
 
         const Product = await newProduct.save();
 
         if (!Product) {
             throw {
                 code: 500,
-                message: "Store product failed!",
-            }
+                message: "STORE_PRODUCT_FAILED",
+            };
         }
 
         return res.status(200).json({
             status: true,
+            message: "STORE_PRODUCT_SUCCESS",
             product: Product,
-        })
+        });
     } catch (err) {
         if (!err.code) {
             err.code = 500;
@@ -111,8 +110,8 @@ const store = async (req, res) => {
         return res.status(err.code).json({
             status: false,
             message: err.message,
-        })
+        });
     }
-}
+};
 
-export {index, store};
+export { index, store };

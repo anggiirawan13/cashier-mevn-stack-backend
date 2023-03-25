@@ -2,8 +2,19 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema(
     {
-        title: {
+        fullname: {
             type: String,
+        },
+        email: {
+            type: String,
+        },
+        password: {
+            type: String,
+        },
+        role: {
+            type: String,
+            enum: ["admin", "cashier", "employee"],
+            default: "employee",
         },
         status: {
             type: String,
@@ -22,4 +33,4 @@ const Schema = mongoose.Schema(
     }
 );
 
-export default mongoose.model("Category", Schema);
+export default mongoose.model("User", Schema);
