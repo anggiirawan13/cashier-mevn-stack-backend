@@ -1,5 +1,54 @@
 import user from "../models/user.js";
 import bcrypt from "bcrypt";
+import jsonwebtoken from "jsonwebtoken";
+import dotenv from "dotenv";
+
+const env = dotenv.config().parsed;
+
+const generateAccessToken = async (payload) => {
+    return jsonwebtoken.sign(payload, env.JWT_ACCESS_TOKEN_SECRET, {
+        expiresIn: env.JWT_ACCESS_TOKEN_LIFE,
+    });
+};
+
+const generateRefreshToken = async (payload) => {
+    return jsonwebtoken.sign(payload, env.JWT_REFRESH_TOKEN_SECRET, {
+        expiresIn: env.JWT_REFRESH_TOKEN_LIFE,
+    });
+};
+
+const isEmailExist = async (email) => {
+    const User = await user.findOne({ email });
+
+    if (!User) {
+        return false;
+    }
+
+    return true;
+};
+
+const checkEmail = async (req, res) => {
+    try {
+        const email = await isEmailExist(req.body.email);
+
+        if (email) {
+            throw {
+                code: 409,
+                message: "EMAIL_IS_EXIST",
+            };
+        }
+
+        res.status(200).json({
+            status: true,
+            message: "EMAIL_NOT_EXIST",
+        });
+    } catch (err) {
+        res.status(err.code).json({
+            status: false,
+            message: err.message,
+        });
+    }
+};
 
 const register = async (req, res) => {
     try {
@@ -31,7 +80,8 @@ const register = async (req, res) => {
             };
         }
 
-        const emailExist = await user.findOne({ email: req.body.email });
+        
+        const emailExist = await isEmailExist(req.body.email);
 
         if (emailExist) {
             throw {
@@ -113,10 +163,15 @@ const login = async (req, res) => {
             };
         }
 
+        const payload = { id: User._id, role: User.role };
+        const accessToken = await generateAccessToken(payload);
+        const refreshToken = await generateRefreshToken(payload);
+
         return res.status(200).json({
             status: true,
             message: "LOGIN_SUCCESS",
-            user: User,
+            accessToken,
+            refreshToken,
         });
     } catch (err) {
         if (!err.code) {
@@ -130,4 +185,47 @@ const login = async (req, res) => {
     }
 };
 
-export { register, login };
+const refreshToken = async (req, res) => {
+    try {
+        if (!req.body.refreshToken) {
+            throw {
+                code: 428,
+                message: "REFRESH_TOKEN_IS_REQUIRED",
+            };
+        }
+
+        const verify = await jsonwebtoken.verify(
+            req.body.refreshToken,
+            env.JWT_REFRESH_TOKEN_SECRET
+        );
+
+        if (!verify) {
+            throw {
+                code: 401,
+                message: "REFRESH_TOKEN_INVALID",
+            };
+        }
+
+        const payload = { id: verify.id, role: verify.role };
+        const accessToken = await generateAccessToken(payload);
+        const refreshToken = await generateRefreshToken(payload);
+
+        return res.status(200).json({
+            status: true,
+            message: "REFRESH_TOKEN_SUCCESS",
+            accessToken,
+            refreshToken,
+        });
+    } catch (err) {
+        if (!err.code) {
+            err.code = 500;
+        }
+
+        return res.status(err.code).json({
+            status: false,
+            message: err.message,
+        });
+    }
+};
+
+export { register, login, refreshToken, checkEmail };
