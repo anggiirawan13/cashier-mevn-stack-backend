@@ -121,7 +121,7 @@ const login = async (req, res) => {
 
         if (!User) {
             throw {
-                code: 409,
+                code: 403,
                 message: "EMAIL_NOT_FOUND",
             };
         }
@@ -133,8 +133,8 @@ const login = async (req, res) => {
 
         if (!passwordIsMatch) {
             throw {
-                code: 428,
-                message: "PASSWORD_IS_WRONG",
+                code: 403,
+                message: "WRONG_PASSWORD",
             };
         }
 
