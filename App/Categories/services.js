@@ -1,4 +1,4 @@
-import category from "../models/Category.js";
+import category from "./models.js";
 
 const index = async (_, res) => {
     try {

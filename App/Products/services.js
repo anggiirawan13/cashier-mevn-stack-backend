@@ -1,5 +1,5 @@
-import product from "../models/Product.js";
-import category from "../models/Category.js";
+import product from "./models.js";
+import category from "../Categories/models.js";
 import mongoose from "mongoose";
 
 const index = async (_, res) => {

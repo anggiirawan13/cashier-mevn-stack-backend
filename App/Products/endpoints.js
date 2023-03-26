@@ -1,5 +1,5 @@
 import express from "express";
-import { index, store } from "./services";
+import { index, store } from "./services.js";
 
 var router = express.Router();
 
