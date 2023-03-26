@@ -3,14 +3,12 @@ import {
     register,
     login,
     refreshToken,
-    checkEmail,
-} from "../controllers/AuthController.js";
+} from "./services.js";
 
 var router = express.Router();
 
 router.post("/register", register);
 router.post("/login", login);
 router.post("/refresh-token", refreshToken);
-router.post("/check-email", checkEmail);
 
 export default router;

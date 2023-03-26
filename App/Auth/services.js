@@ -1,4 +1,4 @@
-import user from "../models/user.js";
+import user from "./models.js";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -27,42 +27,27 @@ const isEmailExist = async (email) => {
     return true;
 };
 
-const checkEmail = async (req, res) => {
+const register = async (req, res) => {
     try {
-        const email = await isEmailExist(req.body.email);
+        if (!req.body.email) {
+            throw {
+                code: 428,
+                message: "EMAIL_IS_REQUIRED",
+            };
+        }
 
-        if (email) {
+        const emailExist = await isEmailExist(req.body.email);
+        if (emailExist) {
             throw {
                 code: 409,
                 message: "EMAIL_IS_EXIST",
             };
         }
 
-        res.status(200).json({
-            status: true,
-            message: "EMAIL_NOT_EXIST",
-        });
-    } catch (err) {
-        res.status(err.code).json({
-            status: false,
-            message: err.message,
-        });
-    }
-};
-
-const register = async (req, res) => {
-    try {
         if (!req.body.fullname) {
             throw {
                 code: 428,
                 message: "FULLNAME_IS_REQUIRED",
-            };
-        }
-
-        if (!req.body.email) {
-            throw {
-                code: 428,
-                message: "EMAIL_IS_REQUIRED",
             };
         }
 
@@ -77,16 +62,6 @@ const register = async (req, res) => {
             throw {
                 code: 428,
                 message: "PASSWORD_MUST_MATCH",
-            };
-        }
-
-        
-        const emailExist = await isEmailExist(req.body.email);
-
-        if (emailExist) {
-            throw {
-                code: 409,
-                message: "EMAIL_IS_EXIST",
             };
         }
 
@@ -228,4 +203,4 @@ const refreshToken = async (req, res) => {
     }
 };
 
-export { register, login, refreshToken, checkEmail };
+export { register, login, refreshToken };
