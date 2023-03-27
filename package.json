@@ -1,5 +1,5 @@
 {
-  "name": "backend-cashier-mevn",
+  "name": "cashier",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -16,5 +16,20 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.3",
     "morgan": "~1.9.1"
-  }
+  },
+  "description": "backend cashier mevn stack",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anggiirawan13/cashier-mevn-stack-backend.git"
+  },
+  "keywords": [
+    "cashier"
+  ],
+  "author": "@anggiirawan13",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anggiirawan13/cashier-mevn-stack-backend/issues"
+  },
+  "homepage": "https://github.com/anggiirawan13/cashier-mevn-stack-backend#readme"
 }

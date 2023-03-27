@@ -61,7 +61,7 @@ const register = async (req, res) => {
         if (req.body.password !== req.body.retype_password) {
             throw {
                 code: 428,
-                message: "PASSWORD_MUST_MATCH",
+                message: "PASSWORD_NOT_MATCH",
             };
         }
 
@@ -72,7 +72,6 @@ const register = async (req, res) => {
             fullname: req.body.fullname,
             email: req.body.email,
             password: passHash,
-            role: req.body.role,
         });
 
         const User = await newUser.save();
@@ -145,8 +144,9 @@ const login = async (req, res) => {
         return res.status(200).json({
             status: true,
             message: "LOGIN_SUCCESS",
-            accessToken,
-            refreshToken,
+            access_token: accessToken,
+            refresh_token: refreshToken,
+            fullname: User.fullname,
         });
     } catch (err) {
         if (!err.code) {
