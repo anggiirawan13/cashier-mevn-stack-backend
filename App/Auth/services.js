@@ -1,7 +1,8 @@
-import user from "./models.js";
+import user from "../Users/models.js";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
 import dotenv from "dotenv";
+import { isEmailExist } from "../../lib/isEmailExist.js";
 
 const env = dotenv.config().parsed;
 
@@ -15,16 +16,6 @@ const generateRefreshToken = async (payload) => {
     return jsonwebtoken.sign(payload, env.JWT_REFRESH_TOKEN_SECRET, {
         expiresIn: env.JWT_REFRESH_TOKEN_LIFE,
     });
-};
-
-const isEmailExist = async (email) => {
-    const User = await user.findOne({ email });
-
-    if (!User) {
-        return false;
-    }
-
-    return true;
 };
 
 const register = async (req, res) => {
@@ -69,7 +60,7 @@ const register = async (req, res) => {
         let passHash = await bcrypt.hash(req.body.password, passSalt);
 
         const newUser = new user({
-            fullname: req.body.fullname,
+            fullname: req.body.fullname.toUpperCase(),
             email: req.body.email,
             password: passHash,
         });
