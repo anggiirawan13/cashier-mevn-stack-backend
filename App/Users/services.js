@@ -7,6 +7,7 @@ const index = async (req, res) => {
     try {
         let search = {
             fullname: { $regex: `^${req.query.search}`, $options: 'i' },
+            status: 'active'
         }
 
         let options = {
@@ -143,6 +144,13 @@ const store = async (req, res) => {
 
 const update = async (req, res) => {
     try {
+        if (!req.params.id) {
+            throw {
+                code: 428,
+                message: 'PARAMS_ID_IS_REQUIRED',
+            }
+        }
+
         if (!req.body.email) {
             throw {
                 code: 428,
@@ -210,9 +218,16 @@ const update = async (req, res) => {
     }
 };
 
-const removeUser = async (req, res) => {
+const destroy = async (req, res) => {
     try {
-        const User = await user.deleteOne({ _id: req.params.id })
+        if (!req.params.id) {
+            throw {
+                code: 428,
+                message: 'PARAMS_ID_IS_REQUIRED',
+            }
+        }
+
+        const User = await user.findByIdAndDelete(req.params.id)
 
         if (!User) {
             throw {
@@ -238,4 +253,4 @@ const removeUser = async (req, res) => {
     }
 };
 
-export { index, show, store, update, removeUser };
+export { index, show, store, update, destroy };
