@@ -1,4 +1,4 @@
-import user from "../Users/models.js";
+import UserModels from "../Users/models.js";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -59,15 +59,15 @@ const register = async (req, res) => {
         let passSalt = await bcrypt.genSalt(10);
         let passHash = await bcrypt.hash(req.body.password, passSalt);
 
-        const newUser = new user({
+        const newUser = new UserModels({
             fullname: req.body.fullname.toUpperCase(),
             email: req.body.email,
             password: passHash,
         });
 
-        const User = await newUser.save();
+        const resultUser = await newUser.save();
 
-        if (!User) {
+        if (!resultUser) {
             throw {
                 code: 500,
                 message: "USER_REGISTER_FAILED",
@@ -77,7 +77,7 @@ const register = async (req, res) => {
         return res.status(200).json({
             status: true,
             message: "USER_REGISTER_SUCCESS",
-            user: User,
+            user: resultUser,
         });
     } catch (err) {
         if (!err.code) {
@@ -107,9 +107,9 @@ const login = async (req, res) => {
             };
         }
 
-        const User = await user.findOne({ email: req.body.email });
+        const resultUser = await UserModels.findOne({ email: req.body.email });
 
-        if (!User) {
+        if (!resultUser) {
             throw {
                 code: 403,
                 message: "EMAIL_NOT_FOUND",
@@ -118,7 +118,7 @@ const login = async (req, res) => {
 
         const passwordIsMatch = bcrypt.compareSync(
             req.body.password,
-            User.password
+            resultUser.password
         );
 
         if (!passwordIsMatch) {
@@ -128,7 +128,7 @@ const login = async (req, res) => {
             };
         }
 
-        const payload = { id: User._id, role: User.role };
+        const payload = { id: resultUser._id, role: resultUser.role };
         const accessToken = await generateAccessToken(payload);
         const refreshToken = await generateRefreshToken(payload);
 
@@ -137,7 +137,7 @@ const login = async (req, res) => {
             message: "LOGIN_SUCCESS",
             access_token: accessToken,
             refresh_token: refreshToken,
-            fullname: User.fullname,
+            fullname: resultUser.fullname,
         });
     } catch (err) {
         if (!err.code) {
@@ -160,17 +160,10 @@ const refreshToken = async (req, res) => {
             };
         }
 
-        const verify = await jsonwebtoken.verify(
+        const verify = jsonwebtoken.verify(
             req.body.refreshToken,
             env.JWT_REFRESH_TOKEN_SECRET
         );
-
-        if (!verify) {
-            throw {
-                code: 401,
-                message: "REFRESH_TOKEN_INVALID",
-            };
-        }
 
         const payload = { id: verify.id, role: verify.role };
         const accessToken = await generateAccessToken(payload);
@@ -179,12 +172,18 @@ const refreshToken = async (req, res) => {
         return res.status(200).json({
             status: true,
             message: "REFRESH_TOKEN_SUCCESS",
-            accessToken,
-            refreshToken,
+            access_token: accessToken,
+            refresh_token: refreshToken,
         });
     } catch (err) {
         if (!err.code) {
-            err.code = 500;
+            err.code = 500
+        }
+
+        if (err.message === 'jwt expired') {
+            err.message = 'REFRESH_TOKEN_EXPIRED'
+        } else {
+            err.message = 'REFRESH_TOKEN_INVALID'
         }
 
         return res.status(err.code).json({

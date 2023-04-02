@@ -1,12 +1,12 @@
-import product from "./models.js";
-import category from "../Categories/models.js";
 import mongoose from "mongoose";
+import ProductModels from "./models.js";
+import CategoryModels from "../Categories/models.js";
 
 const index = async (_, res) => {
     try {
-        const products = await product.find({ status: "active" });
+        const resultProducts = await ProductModels.find({ status: "active" });
 
-        if (!products) {
+        if (!resultProducts) {
             throw {
                 code: 500,
                 message: "GET_PRODUCTS_FAILED",
@@ -15,8 +15,8 @@ const index = async (_, res) => {
 
         return res.status(200).json({
             status: true,
-            total: products.length,
-            products,
+            total: resultProducts.length,
+            products: resultProducts,
         });
     } catch (err) {
         return res.status(err.code).json({
@@ -56,7 +56,7 @@ const store = async (req, res) => {
             };
         }
 
-        const productExist = await product.findOne({ title: req.body.title });
+        const productExist = await ProductModels.findOne({ title: req.body.title });
         if (productExist) {
             throw {
                 code: 428,
@@ -71,7 +71,7 @@ const store = async (req, res) => {
             };
         }
 
-        const categoryExist = await category.findOne({
+        const categoryExist = await CategoryModels.findOne({
             _id: req.body.categoryId,
         });
         if (!categoryExist) {
@@ -81,16 +81,16 @@ const store = async (req, res) => {
             };
         }
 
-        const newProduct = new product({
+        const newProduct = new ProductModels({
             title: req.body.title,
             thumbnail: req.body.thumbnail,
             price: req.body.price,
             categoryId: req.body.categoryId,
         });
 
-        const Product = await newProduct.save();
+        const resultProduct = await newProduct.save();
 
-        if (!Product) {
+        if (!resultProduct) {
             throw {
                 code: 500,
                 message: "STORE_PRODUCT_FAILED",
@@ -100,7 +100,7 @@ const store = async (req, res) => {
         return res.status(200).json({
             status: true,
             message: "STORE_PRODUCT_SUCCESS",
-            product: Product,
+            product: resultProduct,
         });
     } catch (err) {
         if (!err.code) {

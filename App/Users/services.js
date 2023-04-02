@@ -1,5 +1,4 @@
-import mongoose from 'mongoose';
-import user from './models.js';
+import UserModels from './models.js';
 import bcrypt from "bcrypt";
 import { isEmailExist, isEmailExistWithUserID } from '../../lib/isEmailExist.js';
 
@@ -15,9 +14,9 @@ const index = async (req, res) => {
             limit: req.query.limit || 10,
         }
 
-        const users = await user.paginate(search, options);
+        const resultUsers = await UserModels.paginate(search, options);
 
-        if (!users) {
+        if (!resultUsers) {
             throw {
                 code: 404,
                 message: 'USERS_NOT_FOUND',
@@ -26,8 +25,8 @@ const index = async (req, res) => {
 
         return res.status(200).json({
             status: true,
-            total: users.length,
-            users,
+            total: resultUsers.length,
+            users: resultUsers,
         })
     } catch (err) {
         return res.status(err.code).json({
@@ -46,9 +45,9 @@ const show = async (req, res) => {
             }
         }
 
-        const User = await user.findById(req.params.id);
+        const resultUser = await UserModels.findById(req.params.id);
 
-        if (!User) {
+        if (!resultUser) {
             throw {
                 code: 404,
                 message: 'USER_NOT_FOUND',
@@ -57,8 +56,8 @@ const show = async (req, res) => {
 
         return res.status(200).json({
             status: true,
-            total: User.length,
-            user: User
+            total: resultUser.length,
+            user: resultUser
         })
     } catch (err) {
         return res.status(err.code).json({
@@ -109,16 +108,16 @@ const store = async (req, res) => {
         let passSalt = await bcrypt.genSalt(10);
         let passHash = await bcrypt.hash(req.body.password, passSalt);
 
-        const newUser = new user({
+        const newUser = new UserModels({
             fullname: req.body.fullname.toUpperCase(),
             email: req.body.email,
             password: passHash,
             role: req.body.role,
         });
 
-        const User = await newUser.save();
+        const resultUser = await newUser.save();
 
-        if (!User) {
+        if (!resultUser) {
             throw {
                 code: 500,
                 message: "USER_UPDATE_FAILED",
@@ -128,7 +127,7 @@ const store = async (req, res) => {
         return res.status(200).json({
             status: true,
             message: "USER_UPDATE_SUCCESS",
-            user: User,
+            user: resultUser,
         });
     } catch (err) {
         if (!err.code) {
@@ -192,9 +191,9 @@ const update = async (req, res) => {
             fields.password = passHash
         }
 
-        const User = await user.findByIdAndUpdate(req.params.id, fields, { new: true });
+        const resultUser = await UserModels.findByIdAndUpdate(req.params.id, fields, { new: true });
 
-        if (!User) {
+        if (!resultUser) {
             throw {
                 code: 500,
                 message: "USER_UPDATE_FAILED",
@@ -204,7 +203,7 @@ const update = async (req, res) => {
         return res.status(200).json({
             status: true,
             message: "USER_UPDATE_SUCCESS",
-            user: User,
+            user: resultUser,
         });
     } catch (err) {
         if (!err.code) {
@@ -227,9 +226,9 @@ const destroy = async (req, res) => {
             }
         }
 
-        const User = await user.findByIdAndDelete(req.params.id)
+        const resultUser = await UserModels.findByIdAndDelete(req.params.id)
 
-        if (!User) {
+        if (!resultUser) {
             throw {
                 code: 500,
                 message: "USER_DELETE_FAILED",
@@ -239,7 +238,7 @@ const destroy = async (req, res) => {
         return res.status(200).json({
             status: true,
             message: "USER_DELETE_SUCCESS",
-            user: User,
+            user: resultUser,
         });
     } catch (err) {
         if (!err.code) {
