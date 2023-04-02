@@ -1,28 +1,4 @@
-import CategoryModels from "./models.js";
-
-const index = async (_, res) => {
-    try {
-        const resultCategories = await CategoryModels.find({ status: "active" });
-
-        if (!resultCategories) {
-            throw {
-                code: 500,
-                message: "GET_CATEGORIES_FAILED",
-            };
-        }
-
-        return res.status(200).json({
-            status: true,
-            total: resultCategories.length,
-            categories: resultCategories,
-        });
-    } catch (err) {
-        return res.status(err.code).json({
-            status: false,
-            message: err.message,
-        });
-    }
-};
+import CategoryModels from "../models.js";
 
 const store = async (req, res) => {
     try {
@@ -33,8 +9,11 @@ const store = async (req, res) => {
             };
         }
 
+        const dateNow = new Date().getTime();
         const newCategory = new CategoryModels({
             title: req.body.title,
+            created_at: dateNow,
+            updated_at: dateNow,
         });
 
         const resultCategory = await newCategory.save();
@@ -59,4 +38,4 @@ const store = async (req, res) => {
     }
 };
 
-export { index, store };
+export default store;

@@ -4,7 +4,7 @@ import products from "../App/Products/endpoints.js";
 import auth from "../App/Auth/endpoints.js";
 import users from "../App/Users/endpoints.js";
 
-var router = express.Router();
+let router = express.Router();
 
 router.use("/auth", auth);
 router.use("/users", users);

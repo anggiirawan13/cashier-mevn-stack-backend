@@ -1,33 +1,16 @@
 import mongoose from "mongoose";
-import ProductModels from "./models.js";
-import CategoryModels from "../Categories/models.js";
+import ProductModels from "../models.js";
+import CategoryModels from "../../Categories/models.js";
 
-const index = async (_, res) => {
+const update = async (req, res) => {
     try {
-        const resultProducts = await ProductModels.find({ status: "active" });
-
-        if (!resultProducts) {
+        if (!req.params.id) {
             throw {
-                code: 500,
-                message: "GET_PRODUCTS_FAILED",
-            };
+                code: 428,
+                message: 'PARAMS_ID_IS_REQUIRED',
+            }
         }
 
-        return res.status(200).json({
-            status: true,
-            total: resultProducts.length,
-            products: resultProducts,
-        });
-    } catch (err) {
-        return res.status(err.code).json({
-            status: false,
-            message: err.message,
-        });
-    }
-};
-
-const store = async (req, res) => {
-    try {
         if (!req.body.title) {
             throw {
                 code: 428,
@@ -52,22 +35,14 @@ const store = async (req, res) => {
         if (!req.body.categoryId) {
             throw {
                 code: 428,
-                message: "CATEGORYID_IS_REQUIRED",
-            };
-        }
-
-        const productExist = await ProductModels.findOne({ title: req.body.title });
-        if (productExist) {
-            throw {
-                code: 428,
-                message: "PRODUCT_IS_EXIST",
+                message: "CATEGORY_ID_IS_REQUIRED",
             };
         }
 
         if (!mongoose.Types.ObjectId.isValid(req.body.categoryId)) {
             throw {
                 code: 500,
-                message: "CATEGORYID_INVALID",
+                message: "CATEGORY_ID_INVALID",
             };
         }
 
@@ -77,30 +52,32 @@ const store = async (req, res) => {
         if (!categoryExist) {
             throw {
                 code: 428,
-                message: "CATEGORYID_NOT_EXIST",
+                message: "CATEGORY_ID_NOT_EXIST",
             };
         }
 
-        const newProduct = new ProductModels({
+        const dateNow = new Date().getTime();
+        let fields = {
             title: req.body.title,
             thumbnail: req.body.thumbnail,
             price: req.body.price,
-            categoryId: req.body.categoryId,
-        });
+            category_id: req.body.categoryId,
+            updated_at: dateNow,
+        }
 
-        const resultProduct = await newProduct.save();
+        const resultCategory = await ProductModels.findByIdAndUpdate(req.params.id, fields, { new: true });
 
-        if (!resultProduct) {
+        if (!resultCategory) {
             throw {
                 code: 500,
-                message: "STORE_PRODUCT_FAILED",
+                message: "PRODUCT_UPDATE_FAILED",
             };
         }
 
         return res.status(200).json({
             status: true,
-            message: "STORE_PRODUCT_SUCCESS",
-            product: resultProduct,
+            message: "PRODUCT_UPDATE_SUCCESS",
+            category: resultCategory,
         });
     } catch (err) {
         if (!err.code) {
@@ -114,4 +91,4 @@ const store = async (req, res) => {
     }
 };
 
-export { index, store };
+export default update;

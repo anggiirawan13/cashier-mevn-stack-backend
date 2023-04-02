@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import monoogsePaginate from 'mongoose-paginate-v2';
 
 const Schema = mongoose.Schema(
     {
@@ -11,30 +12,24 @@ const Schema = mongoose.Schema(
         price: {
             type: Number,
         },
-        categoryId: {
+        category_id: {
             type: mongoose.Schema.Types.ObjectId,
+            ref: "Categories",
         },
         status: {
             type: String,
             enum: ["active", "inactive"],
             default: "active",
         },
-        createdAt: {
+        created_at: {
             type: Number,
         },
-        updatedAt: {
+        updated_at: {
             type: Number,
         },
-    },
-    {
-        timestamps: { currentTime: () => Math.floor(Date.now() / 1000) },
     }
 );
 
-Schema.virtual("categories", {
-    ref: "category",
-    localField: "categoryId",
-    foreignField: "_id",
-});
+Schema.plugin(monoogsePaginate);
 
-export default mongoose.model("Product", Schema);
+export default mongoose.model("Products", Schema);

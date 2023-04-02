@@ -1,11 +1,9 @@
 import express from "express";
-import {
-    register,
-    login,
-    refreshToken,
-} from "./services.js";
+import register from "./register/services.js";
+import login from "./login/services.js";
+import refreshToken from "./refreshToken/services.js";
 
-var router = express.Router();
+let router = express.Router();
 
 router.post("/register", register);
 router.post("/login", login);

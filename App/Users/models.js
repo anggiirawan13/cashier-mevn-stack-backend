@@ -22,18 +22,15 @@ const Schema = mongoose.Schema(
             enum: ["active", "inactive"],
             default: "active",
         },
-        createdAt: {
+        created_at: {
             type: Number,
         },
-        updatedAt: {
+        updated_at: {
             type: Number,
         },
-    },
-    {
-        timestamps: { currentTime: () => Math.floor(Date.now() / 1000) },
     }
 );
 
 Schema.plugin(monoogsePaginate);
 
-export default mongoose.model("User", Schema);
+export default mongoose.model("Users", Schema);
