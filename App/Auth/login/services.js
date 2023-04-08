@@ -18,7 +18,8 @@ const login = async (req, res) => {
             };
         }
 
-        const resultUser = await UserModels.findOne({ email: req.body.email });
+
+        const resultUser = await UserModels.findOne({ email: String(req.body.email) });
 
         if (!resultUser) {
             throw {
@@ -28,8 +29,8 @@ const login = async (req, res) => {
         }
 
         const passwordIsMatch = bcrypt.compareSync(
-            req.body.password,
-            resultUser.password
+            String(req.body.password),
+            String(resultUser.password)
         );
 
         if (!passwordIsMatch) {

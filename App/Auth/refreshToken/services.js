@@ -13,11 +13,11 @@ const refreshToken = async (req, res) => {
         }
 
         const verify = jsonwebtoken.verify(
-            req.body.refreshToken,
-            env.JWT_REFRESH_TOKEN_SECRET
+            String(req.body.refreshToken),
+            String(env.JWT_REFRESH_TOKEN_SECRET)
         );
 
-        const payload = { id: verify.id, role: verify.role };
+        const payload = { id: String(verify.id), role: String(verify.role) };
         const accessToken = await generateAccessToken(payload);
         const refreshToken = await generateRefreshToken(payload);
 

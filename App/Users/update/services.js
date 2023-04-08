@@ -18,7 +18,7 @@ const update = async (req, res) => {
             };
         }
 
-        const emailExist = await isEmailExistWithUserID(req.params.id, req.body.email);
+        const emailExist = await isEmailExistWithUserID(String(req.params.id), String(req.body.email));
         if (emailExist) {
             throw {
                 code: 409,
@@ -41,20 +41,20 @@ const update = async (req, res) => {
         }
 
         let fields = {
-            fullname: req.body.fullname,
-            email: req.body.email,
-            role: req.body.role,
-            status: req.body.status,
+            fullname: String(req.body.fullname),
+            email: String(req.body.email),
+            role: String(req.body.role),
+            status: String(req.body.status),
             updated_at: new Date().getTime(),
         }
 
         if (req.body.password) {
             let passSalt = await bcrypt.genSalt(10);
-            let passHash = await bcrypt.hash(req.body.password, passSalt);
+            let passHash = await bcrypt.hash(String(req.body.password), String(passSalt));
             fields.password = passHash
         }
 
-        const resultUser = await UserModels.findByIdAndUpdate(req.params.id, fields, { new: true });
+        const resultUser = await UserModels.findByIdAndUpdate({_id: String(req.params.id)}, fields, { new: true });
 
         if (!resultUser) {
             throw {

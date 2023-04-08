@@ -4,14 +4,14 @@ import { isEmailExist } from "../../../lib/isEmailExist.js";
 
 const register = async (req, res) => {
     try {
-        if (!req.body.email) {
+        if (req.body.email) {
             throw {
                 code: 428,
                 message: "EMAIL_IS_REQUIRED",
             };
         }
 
-        const emailExist = await isEmailExist(req.body.email);
+        const emailExist = await isEmailExist(String(req.body.email));
         if (emailExist) {
             throw {
                 code: 409,
@@ -33,7 +33,7 @@ const register = async (req, res) => {
             };
         }
 
-        if (req.body.password !== req.body.retype_password) {
+        if (String(req.body.password) !== String(req.body.retype_password)) {
             throw {
                 code: 428,
                 message: "PASSWORD_NOT_MATCH",
@@ -41,13 +41,13 @@ const register = async (req, res) => {
         }
 
         let passSalt = await bcrypt.genSalt(10);
-        let passHash = await bcrypt.hash(req.body.password, passSalt);
+        let passHash = await bcrypt.hash(String(req.body.password), String(passSalt));
 
         const dateNow = new Date().getTime();
         const newUser = new UserModels({
-            fullname: req.body.fullname.toUpperCase(),
-            email: req.body.email,
-            password: passHash,
+            fullname: String(req.body.fullname).toUpperCase(),
+            email: String(req.body.email),
+            password: String(passHash),
             created_at: dateNow,
             updated_at: dateNow,
         });

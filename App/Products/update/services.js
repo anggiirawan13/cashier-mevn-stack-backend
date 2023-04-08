@@ -39,7 +39,7 @@ const update = async (req, res) => {
             };
         }
 
-        if (!mongoose.Types.ObjectId.isValid(req.body.categoryId)) {
+        if (!mongoose.Types.ObjectId.isValid(String(req.body.categoryId))) {
             throw {
                 code: 500,
                 message: "CATEGORY_ID_INVALID",
@@ -47,7 +47,7 @@ const update = async (req, res) => {
         }
 
         const categoryExist = await CategoryModels.findOne({
-            _id: req.body.categoryId,
+            _id: String(req.body.categoryId),
         });
         if (!categoryExist) {
             throw {
@@ -58,14 +58,14 @@ const update = async (req, res) => {
 
         const dateNow = new Date().getTime();
         let fields = {
-            title: req.body.title,
-            thumbnail: req.body.thumbnail,
-            price: req.body.price,
-            category_id: req.body.categoryId,
+            title: String(req.body.title),
+            thumbnail: String(req.body.thumbnail),
+            price: String(req.body.price),
+            category_id: String(req.body.categoryId),
             updated_at: dateNow,
         }
 
-        const resultCategory = await ProductModels.findByIdAndUpdate(req.params.id, fields, { new: true });
+        const resultCategory = await ProductModels.findByIdAndUpdate({_id: String(req.params.id)}, fields, { new: true });
 
         if (!resultCategory) {
             throw {

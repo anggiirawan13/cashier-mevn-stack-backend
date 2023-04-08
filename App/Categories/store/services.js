@@ -11,7 +11,7 @@ const store = async (req, res) => {
 
         const dateNow = new Date().getTime();
         const newCategory = new CategoryModels({
-            title: req.body.title,
+            title: String(req.body.title),
             created_at: dateNow,
             updated_at: dateNow,
         });

@@ -12,7 +12,7 @@ const store = async (req, res) => {
             };
         }
 
-        const emailExist = await isEmailExist(req.body.email);
+        const emailExist = await isEmailExist(String(req.body.email));
         if (emailExist) {
             throw {
                 code: 409,
@@ -42,14 +42,14 @@ const store = async (req, res) => {
         }
 
         let passSalt = await bcrypt.genSalt(10);
-        let passHash = await bcrypt.hash(req.body.password, passSalt);
+        let passHash = await bcrypt.hash(String(req.body.password), String(passSalt));
 
         const dateNow = new Date().getTime();
         const newUser = new UserModels({
-            fullname: req.body.fullname.toUpperCase(),
-            email: req.body.email,
-            password: passHash,
-            role: req.body.role,
+            fullname: String(req.body.fullname).toUpperCase(),
+            email: String(req.body.email),
+            password: String(passHash),
+            role: String(req.body.role),
             created_at: dateNow,
             updated_at: dateNow,
         });

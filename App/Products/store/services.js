@@ -32,7 +32,7 @@ const store = async (req, res) => {
             };
         }
 
-        const productExist = await ProductModels.findOne({ title: req.body.title });
+        const productExist = await ProductModels.findOne({ title: String(req.body.title) });
         if (productExist) {
             throw {
                 code: 428,
@@ -40,7 +40,7 @@ const store = async (req, res) => {
             };
         }
 
-        if (!mongoose.Types.ObjectId.isValid(req.body.categoryId)) {
+        if (!mongoose.Types.ObjectId.isValid(String(req.body.categoryId))) {
             throw {
                 code: 500,
                 message: "CATEGORY_ID_INVALID",
@@ -48,7 +48,7 @@ const store = async (req, res) => {
         }
 
         const categoryExist = await CategoryModels.findOne({
-            _id: req.body.categoryId,
+            _id: String(req.body.categoryId),
         });
         if (!categoryExist) {
             throw {
@@ -59,10 +59,10 @@ const store = async (req, res) => {
 
         const dateNow = new Date().getTime();
         const newProduct = new ProductModels({
-            title: req.body.title,
-            thumbnail: req.body.thumbnail,
-            price: req.body.price,
-            category_id: req.body.categoryId,
+            title: String(req.body.title),
+            thumbnail: String(req.body.thumbnail),
+            price: String(req.body.price),
+            category_id: String(req.body.categoryId),
             created_at: dateNow,
             updated_at: dateNow,
         });

@@ -17,12 +17,12 @@ const update = async (req, res) => {
         }
 
         let fields = {
-            title: req.body.title,
-            status: req.body.status,
+            title: String(req.body.title),
+            status: String(req.body.status),
             updated_at: new Date().getTime(),
         }
 
-        const resultCategory = await CategoryModels.findByIdAndUpdate(req.params.id, fields, { new: true });
+        const resultCategory = await CategoryModels.findByIdAndUpdate({_id: String(req.params.id)}, fields, { new: true });
 
         if (!resultCategory) {
             throw {
