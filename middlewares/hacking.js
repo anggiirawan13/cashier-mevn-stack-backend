@@ -1,4 +1,4 @@
-import SQLi from "../handler/hacking/SQLInjection.js";
+import SQLi from "../handler/hacking/NoSQLInjection.js";
 
 const handleHacking = () => {
     return function(req, res, next) {
